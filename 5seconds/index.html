@@ -2,51 +2,90 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jeu des 5 secondes</title>
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      text-align: center;
-      background: #f0f0f0;
-      padding: 40px;
+    * {
+      box-sizing: border-box;
     }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: #f0f0f0;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 600px;
+      padding: 20px;
+    }
+
     h1 {
-      font-size: 2em;
+      font-size: 2.5em;
       margin-bottom: 20px;
     }
+
     .question {
-      font-size: 1.5em;
+      font-size: 1.8em;
       margin: 30px 0;
-      min-height: 60px;
+      min-height: 80px;
     }
+
     .timer {
-      font-size: 2em;
+      font-size: 2.2em;
       color: red;
       margin: 20px 0;
     }
+
     button {
-      font-size: 1em;
-      padding: 10px 20px;
+      font-size: 1.5em;
+      padding: 15px 30px;
       border: none;
       background: #4CAF50;
       color: white;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
-    button:hover {
+
+    button:disabled {
+      background: #888;
+      cursor: not-allowed;
+    }
+
+    button:hover:enabled {
       background: #45a049;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .pulse {
+      animation: pulse 1s infinite;
     }
   </style>
 </head>
 <body>
 
-  <h1>🎯 Jeu des 5 secondes</h1>
-  <div class="question">Clique sur le bouton pour commencer !</div>
-  <div class="timer">⏱️</div>
-  <button onclick="nouvelleQuestion()">Nouvelle question</button>
+  <div class="container">
+    <h1>🎯 Jeu des 5 secondes</h1>
+    <div class="question">Clique sur le bouton pour commencer !</div>
+    <div class="timer">⏱️</div>
+    <button id="btn-question" onclick="nouvelleQuestion()">Nouvelle question</button>
+  </div>
 
-  <!-- Effet sonore (gong) -->
+  <!-- Sons -->
   <audio id="gong" src="https://www.soundjay.com/button/sounds/beep-07.mp3" preload="auto"></audio>
+  <audio id="ding" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
 
   <script>
     const questions = [
@@ -72,14 +111,41 @@
     function nouvelleQuestion() {
       clearInterval(timerInterval);
 
+      const bouton = document.getElementById('btn-question');
+      bouton.disabled = true;
+
       const randomIndex = Math.floor(Math.random() * questions.length);
       const question = questions[randomIndex];
       document.querySelector('.question').textContent = question;
 
       lireQuestion(question);
+    }
 
+    function lireQuestion(texte) {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(texte);
+      utterance.lang = 'fr-FR';
+
+      const questionDiv = document.querySelector('.question');
+      questionDiv.classList.add('pulse');
+
+      const ding = document.getElementById('ding');
+      ding.onended = () => {
+        synth.speak(utterance);
+      };
+
+      utterance.onend = () => {
+        questionDiv.classList.remove('pulse');
+        demarrerTimer();
+      };
+
+      ding.play();
+    }
+
+    function demarrerTimer() {
       let temps = 5;
       const timerDiv = document.querySelector('.timer');
+      const bouton = document.getElementById('btn-question');
       timerDiv.textContent = `⏱️ ${temps}s`;
 
       timerInterval = setInterval(() => {
@@ -90,19 +156,12 @@
           timerDiv.textContent = "⏳ Temps écoulé !";
           clearInterval(timerInterval);
           jouerGong();
+          bouton.disabled = false;
         }
       }, 1000);
     }
 
-    function lireQuestion(texte) {
-      const synth = window.speechSynthesis;
-      const utterance = new SpeechSynthesisUtterance(texte);
-      utterance.lang = 'fr-FR';
-      synth.speak(utterance);
-    }
-
     function jouerGong() {
-      console.log("gong");
       const gong = document.getElementById('gong');
       gong.play();
     }

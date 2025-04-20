@@ -69,10 +69,15 @@
     function nouvelleQuestion() {
       clearInterval(timerInterval);
 
+      // Sélection d'une question aléatoire
       const randomIndex = Math.floor(Math.random() * questions.length);
       const question = questions[randomIndex];
       document.querySelector('.question').textContent = question;
 
+      // Lire la question avec TTS
+      lireQuestion(question);
+
+      // Initialisation du timer
       let temps = 5;
       const timerDiv = document.querySelector('.timer');
       timerDiv.textContent = `⏱️ ${temps}s`;
@@ -86,6 +91,14 @@
           clearInterval(timerInterval);
         }
       }, 1000);
+    }
+
+    function lireQuestion(texte) {
+      // Utilisation de l'API SpeechSynthesis
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(texte);
+      utterance.lang = 'fr-FR'; // Définit la langue en français
+      synth.speak(utterance);
     }
   </script>
 

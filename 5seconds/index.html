@@ -5,87 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jeu des 5 secondes</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
       font-family: 'Arial', sans-serif;
-      background: #f0f0f0;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .container {
       text-align: center;
-      max-width: 600px;
-      padding: 20px;
+      background: #f0f0f0;
+      padding: 40px;
     }
 
     h1 {
-      font-size: 2.5em;
+      font-size: 2em;
       margin-bottom: 20px;
     }
 
     .question {
-      font-size: 1.8em;
+      font-size: 1.5em;
       margin: 30px 0;
-      min-height: 80px;
+      min-height: 60px;
     }
 
     .timer {
-      font-size: 2.2em;
+      font-size: 2em;
       color: red;
       margin: 20px 0;
     }
 
     button {
-      font-size: 1.5em;
-      padding: 15px 30px;
+      font-size: 1.2em;
+      padding: 12px 24px;
       border: none;
       background: #4CAF50;
       color: white;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
 
     button:disabled {
-      background: #888;
-      cursor: not-allowed;
-    }
-
-    button:hover:enabled {
-      background: #45a049;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-
-    .pulse {
-      animation: pulse 1s infinite;
+      background: gray;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>🎯 Jeu des 5 secondes</h1>
-    <div class="question">Clique sur le bouton pour commencer !</div>
-    <div class="timer">⏱️</div>
-    <button id="btn-question" onclick="nouvelleQuestion()">Nouvelle question</button>
-  </div>
+  <h1>🎯 Jeu des 5 secondes</h1>
+  <div class="question">Clique sur le bouton pour commencer !</div>
+  <div class="timer">⏱️</div>
+  <button id="btn-question" onclick="nouvelleQuestion()">Nouvelle question</button>
 
-  <!-- Sons -->
   <audio id="gong" src="https://www.soundjay.com/button/sounds/beep-07.mp3" preload="auto"></audio>
-  <audio id="ding" src="https://www.soundjay.com/button/sounds/button-16.mp3" preload="auto"></audio>
 
   <script>
     const questions = [
@@ -114,38 +81,35 @@
       const bouton = document.getElementById('btn-question');
       bouton.disabled = true;
 
-      const randomIndex = Math.floor(Math.random() * questions.length);
-      const question = questions[randomIndex];
+      const question = questions[Math.floor(Math.random() * questions.length)];
       document.querySelector('.question').textContent = question;
 
-      lireQuestion(question);
+      lireQuestion(question, demarrerTimer);
     }
 
-    function lireQuestion(texte) {
+    function lireQuestion(texte, callback) {
       const synth = window.speechSynthesis;
+
+      // S'assurer que rien n’est en train d’être lu
+      if (synth.speaking) {
+        synth.cancel();
+      }
+
       const utterance = new SpeechSynthesisUtterance(texte);
       utterance.lang = 'fr-FR';
 
-      const questionDiv = document.querySelector('.question');
-      questionDiv.classList.add('pulse');
-
-      const ding = document.getElementById('ding');
-      ding.onended = () => {
-        synth.speak(utterance);
-      };
-
       utterance.onend = () => {
-        questionDiv.classList.remove('pulse');
-        demarrerTimer();
+        callback(); // Timer démarre ici !
       };
 
-      ding.play();
+      synth.speak(utterance);
     }
 
     function demarrerTimer() {
       let temps = 5;
       const timerDiv = document.querySelector('.timer');
       const bouton = document.getElementById('btn-question');
+
       timerDiv.textContent = `⏱️ ${temps}s`;
 
       timerInterval = setInterval(() => {

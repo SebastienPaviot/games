@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Jeu des 5 secondes</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    .question {
+      font-size: 1.5em;
+      margin: 30px 0;
+      min-height: 60px;
+    }
+    .timer {
+      font-size: 2em;
+      color: red;
+      margin: 20px 0;
+    }
+    button {
+      font-size: 1em;
+      padding: 10px 20px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎯 Jeu des 5 secondes</h1>
+  <div class="question">Clique sur le bouton pour commencer !</div>
+  <div class="timer">⏱️</div>
+  <button onclick="nouvelleQuestion()">Nouvelle question</button>
+
+  <script>
+    const questions = [
+      "Cite 3 animaux de la ferme",
+      "Donne 3 marques de voiture",
+      "Cite 3 pays d'Afrique",
+      "Nomme 3 personnages de dessin animé",
+      "Donne 3 objets qu'on trouve dans une cuisine",
+      "Cite 3 fruits rouges",
+      "Donne 3 prénoms qui commencent par M",
+      "Nomme 3 choses qui volent",
+      "Cite 3 instruments de musique",
+      "Donne 3 sports d'hiver",
+      "Cite 3 réseaux sociaux",
+      "Nomme 3 aliments que tu détestes",
+      "Donne 3 trucs qu’on ne met jamais dans un lave-vaisselle",
+      "Cite 3 choses jaunes",
+      "Donne 3 capitales européennes",
+    ];
+
+    let timerInterval;
+
+    function nouvelleQuestion() {
+      clearInterval(timerInterval);
+
+      const randomIndex = Math.floor(Math.random() * questions.length);
+      const question = questions[randomIndex];
+      document.querySelector('.question').textContent = question;
+
+      let temps = 5;
+      const timerDiv = document.querySelector('.timer');
+      timerDiv.textContent = `⏱️ ${temps}s`;
+
+      timerInterval = setInterval(() => {
+        temps--;
+        if (temps > 0) {
+          timerDiv.textContent = `⏱️ ${temps}s`;
+        } else {
+          timerDiv.textContent = "⏳ Temps écoulé !";
+          clearInterval(timerInterval);
+        }
+      }, 1000);
+    }
+  </script>
+
+</body>
+</html>

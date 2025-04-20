@@ -33,6 +33,13 @@
     .joueur {
       font-size: 1.2em;
       margin-bottom: 10px;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .joueur-actif {
+      background-color: #4CAF50;
+      color: white;
     }
 
     .scores {
@@ -68,7 +75,7 @@
 <body>
 
   <h1>🎯 Jeu des 5 secondes</h1>
-  <div class="joueur">👤 Joueur : <span id="nom-joueur"></span></div>
+  <div class="joueur" id="joueur-1">👤 Joueur : <span id="nom-joueur"></span></div>
   <div class="question">Clique sur le bouton pour commencer !</div>
   <div class="timer">⏱️</div>
   <div class="scores"></div>
@@ -105,7 +112,15 @@
     let timerInterval;
 
     function afficherJoueur() {
-      document.getElementById('nom-joueur').textContent = joueurs[indexJoueur];
+      const joueurActif = joueurs[indexJoueur];
+      document.getElementById('nom-joueur').textContent = joueurActif;
+      document.querySelectorAll('.joueur').forEach((el, idx) => {
+        if (idx === indexJoueur) {
+          el.classList.add('joueur-actif');
+        } else {
+          el.classList.remove('joueur-actif');
+        }
+      });
       afficherScores();
     }
 
@@ -113,6 +128,9 @@
       const scoresDiv = document.querySelector('.scores');
       scoresDiv.innerHTML = joueurs.map(j => `${j} : ${scores[j]} pt${scores[j] !== 1 ? 's' : ''}`).join(' | ');
     }
+
+    // Affichage du premier joueur au début
+    afficherJoueur();
 
     function nouvelleQuestion() {
       clearInterval(timerInterval);
@@ -123,8 +141,6 @@
       bouton.disabled = true;
       boutonScore.disabled = true;
       boutonMauvaiseReponse.disabled = true;
-
-      afficherJoueur();
 
       let question;
       do {

@@ -1,0 +1,66 @@
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  background: #f0f0f0;
+  padding: 40px;
+}
+
+h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.question {
+  font-size: 1.5em;
+  margin: 30px 0;
+  min-height: 60px;
+}
+
+.timer {
+  font-size: 2em;
+  color: red;
+  margin: 20px 0;
+}
+
+.joueur {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.joueur-actif {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.scores {
+  margin-top: 20px;
+  font-size: 1em;
+}
+
+button {
+  font-size: 1.2em;
+  padding: 12px 24px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: gray; /* Couleur grise pour les boutons désactivés */
+  cursor: not-allowed;
+}
+
+#btn-score {
+  background: #2196F3;
+  margin-top: 10px;
+}
+
+#btn-mauvaise-reponse {
+  background: #F44336;
+  margin-top: 10px;
+}

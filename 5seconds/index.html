@@ -45,6 +45,9 @@
   <div class="timer">⏱️</div>
   <button onclick="nouvelleQuestion()">Nouvelle question</button>
 
+  <!-- Effet sonore (gong) -->
+  <audio id="gong" src="https://www.soundjay.com/button/sounds/beep-07.mp3" preload="auto"></audio>
+
   <script>
     const questions = [
       "Cite 3 animaux de la ferme",
@@ -69,15 +72,12 @@
     function nouvelleQuestion() {
       clearInterval(timerInterval);
 
-      // Sélection d'une question aléatoire
       const randomIndex = Math.floor(Math.random() * questions.length);
       const question = questions[randomIndex];
       document.querySelector('.question').textContent = question;
 
-      // Lire la question avec TTS
       lireQuestion(question);
 
-      // Initialisation du timer
       let temps = 5;
       const timerDiv = document.querySelector('.timer');
       timerDiv.textContent = `⏱️ ${temps}s`;
@@ -89,16 +89,21 @@
         } else {
           timerDiv.textContent = "⏳ Temps écoulé !";
           clearInterval(timerInterval);
+          jouerGong();
         }
       }, 1000);
     }
 
     function lireQuestion(texte) {
-      // Utilisation de l'API SpeechSynthesis
       const synth = window.speechSynthesis;
       const utterance = new SpeechSynthesisUtterance(texte);
-      utterance.lang = 'fr-FR'; // Définit la langue en français
+      utterance.lang = 'fr-FR';
       synth.speak(utterance);
+    }
+
+    function jouerGong() {
+      const gong = document.getElementById('gong');
+      gong.play();
     }
   </script>
 

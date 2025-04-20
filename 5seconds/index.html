@@ -30,6 +30,16 @@
       margin: 20px 0;
     }
 
+    .joueur {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
+    .scores {
+      margin-top: 20px;
+      font-size: 1em;
+    }
+
     button {
       font-size: 1.2em;
       padding: 12px 24px;
@@ -43,14 +53,23 @@
     button:disabled {
       background: gray;
     }
+
+    #btn-score {
+      background: #2196F3;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
 
   <h1>🎯 Jeu des 5 secondes</h1>
+  <div class="joueur">👤 Joueur : <span id="nom-joueur"></span></div>
   <div class="question">Clique sur le bouton pour commencer !</div>
   <div class="timer">⏱️</div>
+  <div class="scores"></div>
+
   <button id="btn-question" onclick="nouvelleQuestion()">Nouvelle question</button>
+  <button id="btn-score" onclick="validerBonneReponse()" disabled>✅ Bonne réponse</button>
 
   <audio id="gong" src="https://www.soundjay.com/button/sounds/beep-07.mp3" preload="auto"></audio>
 
@@ -73,24 +92,45 @@
       "Donne 3 capitales européennes",
     ];
 
+    const joueurs = ["Alice", "Bob", "Charlie"]; // Liste des joueurs
+    let indexJoueur = 0;
+    let scores = joueurs.reduce((acc, joueur) => ({ ...acc, [joueur]: 0 }), {});
+    let derniereQuestion = '';
     let timerInterval;
+
+    function afficherJoueur() {
+      document.getElementById('nom-joueur').textContent = joueurs[indexJoueur];
+      afficherScores();
+    }
+
+    function afficherScores() {
+      const scoresDiv = document.querySelector('.scores');
+      scoresDiv.innerHTML = joueurs.map(j => `${j} : ${scores[j]} pt${scores[j] !== 1 ? 's' : ''}`).join(' | ');
+    }
 
     function nouvelleQuestion() {
       clearInterval(timerInterval);
 
       const bouton = document.getElementById('btn-question');
+      const boutonScore = document.getElementById('btn-score');
       bouton.disabled = true;
+      boutonScore.disabled = true;
 
-      const question = questions[Math.floor(Math.random() * questions.length)];
+      afficherJoueur();
+
+      let question;
+      do {
+        question = questions[Math.floor(Math.random() * questions.length)];
+      } while (question === derniereQuestion);
+      derniereQuestion = question;
+
       document.querySelector('.question').textContent = question;
-
       lireQuestion(question, demarrerTimer);
     }
 
     function lireQuestion(texte, callback) {
       const synth = window.speechSynthesis;
 
-      // S'assurer que rien n’est en train d’être lu
       if (synth.speaking) {
         synth.cancel();
       }
@@ -99,7 +139,7 @@
       utterance.lang = 'fr-FR';
 
       utterance.onend = () => {
-        callback(); // Timer démarre ici !
+        callback(); // Démarre le timer après la lecture
       };
 
       synth.speak(utterance);
@@ -109,6 +149,7 @@
       let temps = 5;
       const timerDiv = document.querySelector('.timer');
       const bouton = document.getElementById('btn-question');
+      const boutonScore = document.getElementById('btn-score');
 
       timerDiv.textContent = `⏱️ ${temps}s`;
 
@@ -120,7 +161,7 @@
           timerDiv.textContent = "⏳ Temps écoulé !";
           clearInterval(timerInterval);
           jouerGong();
-          bouton.disabled = false;
+          boutonScore.disabled = false; // Autoriser le vote à la fin du temps
         }
       }, 1000);
     }
@@ -128,6 +169,24 @@
     function jouerGong() {
       const gong = document.getElementById('gong');
       gong.play();
+    }
+
+    function validerBonneReponse() {
+      const joueur = joueurs[indexJoueur];
+      scores[joueur]++;
+      afficherScores();
+
+      passerAuJoueurSuivant();
+    }
+
+    function passerAuJoueurSuivant() {
+      const bouton = document.getElementById('btn-question');
+      const boutonScore = document.getElementById('btn-score');
+
+      boutonScore.disabled = true;
+      bouton.disabled = false;
+      indexJoueur = (indexJoueur + 1) % joueurs.length;
+      afficherJoueur();
     }
   </script>
 

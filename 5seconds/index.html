@@ -87,25 +87,15 @@
   <audio id="gong" src="https://www.soundjay.com/button/sounds/beep-07.mp3" preload="auto"></audio>
 
   <script>
-    const questions = [
-      "Cite 3 animaux de la ferme",
-      "Donne 3 marques de voiture",
-      "Cite 3 pays d'Afrique",
-      "Nomme 3 personnages de dessin animé",
-      "Donne 3 objets qu'on trouve dans une cuisine",
-      "Cite 3 fruits rouges",
-      "Donne 3 prénoms qui commencent par M",
-      "Nomme 3 choses qui volent",
-      "Cite 3 instruments de musique",
-      "Donne 3 sports d'hiver",
-      "Cite 3 réseaux sociaux",
-      "Nomme 3 aliments que tu détestes",
-      "Donne 3 trucs qu’on ne met jamais dans un lave-vaisselle",
-      "Cite 3 choses jaunes",
-      "Donne 3 capitales européennes",
-    ];
+    let questions = [];
+    fetch('questions.json')
+      .then(response => response.json())
+      .then(data => {
+        questions = data.questions;
+      })
+      .catch(error => console.error('Erreur de chargement des questions :', error));
 
-    const joueurs = ["Alice", "Bob", "Charlie"]; // Liste des joueurs
+    const joueurs = ["Seb", "Louise", "Aurélie"];
     let indexJoueur = 0;
     let scores = joueurs.reduce((acc, joueur) => ({ ...acc, [joueur]: 0 }), {});
     let derniereQuestion = '';
@@ -129,7 +119,6 @@
       scoresDiv.innerHTML = joueurs.map(j => `${j} : ${scores[j]} pt${scores[j] !== 1 ? 's' : ''}`).join(' | ');
     }
 
-    // Affichage du premier joueur au début
     afficherJoueur();
 
     function nouvelleQuestion() {
@@ -163,7 +152,7 @@
       utterance.lang = 'fr-FR';
 
       utterance.onend = () => {
-        callback(); // Démarre le timer après la lecture
+        callback();
       };
 
       synth.speak(utterance);
@@ -172,7 +161,6 @@
     function demarrerTimer() {
       let temps = 5;
       const timerDiv = document.querySelector('.timer');
-      const bouton = document.getElementById('btn-question');
       const boutonScore = document.getElementById('btn-score');
       const boutonMauvaiseReponse = document.getElementById('btn-mauvaise-reponse');
 
@@ -186,8 +174,8 @@
           timerDiv.textContent = "⏳ Temps écoulé !";
           clearInterval(timerInterval);
           jouerGong();
-          boutonScore.disabled = false; // Autoriser le bouton "Bonne réponse"
-          boutonMauvaiseReponse.disabled = false; // Autoriser le bouton "Mauvaise réponse"
+          boutonScore.disabled = false;
+          boutonMauvaiseReponse.disabled = false;
         }
       }, 1000);
     }
@@ -201,12 +189,10 @@
       const joueur = joueurs[indexJoueur];
       scores[joueur]++;
       afficherScores();
-
       passerAuJoueurSuivant();
     }
 
     function validerMauvaiseReponse() {
-      // Pas de point pour la mauvaise réponse, on passe au joueur suivant
       passerAuJoueurSuivant();
     }
 

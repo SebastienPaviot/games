@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Jeu des 5 secondes</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -20,8 +20,8 @@
   <div class="scores"></div>
 
   <button id="btn-question" onclick="nouvelleQuestion()">Nouvelle question</button>
-  <button id="btn-score" onclick="validerBonneReponse()" disabled>✅ Bonne réponse</button>
-  <button id="btn-mauvaise-reponse" onclick="validerMauvaiseReponse()" disabled>❌ Mauvaise réponse</button>
+  <button id="btn-score" style="display: none;" onclick="validerBonneReponse()" disabled>✅ Bonne réponse</button>
+  <button id="btn-mauvaise-reponse" style="display: none;" onclick="validerMauvaiseReponse()" disabled>❌ Mauvaise réponse</button>
   <button onclick="resetJeu()">🔄 Réinitialiser</button>
 
   <audio id="gong" src="https://www.soundjay.com/button/sounds/beep-07.mp3" preload="auto"></audio>
@@ -75,6 +75,8 @@
       bouton.disabled = true;
       boutonScore.disabled = true;
       boutonMauvaiseReponse.disabled = true;
+      boutonScore.style.display = 'none';
+      boutonMauvaiseReponse.style.display = 'none';
 
       let question;
       do {
@@ -120,6 +122,9 @@
           timerDiv.textContent = "⏳ Temps écoulé !";
           clearInterval(timerInterval);
           jouerGong();
+
+          boutonScore.style.display = 'inline-block';
+          boutonMauvaiseReponse.style.display = 'inline-block';
           boutonScore.disabled = false;
           boutonMauvaiseReponse.disabled = false;
         }
@@ -149,6 +154,9 @@
 
       boutonScore.disabled = true;
       boutonMauvaiseReponse.disabled = true;
+      boutonScore.style.display = 'none';
+      boutonMauvaiseReponse.style.display = 'none';
+
       bouton.disabled = false;
       indexJoueur = (indexJoueur + 1) % joueurs.length;
       afficherJoueur();

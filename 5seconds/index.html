@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Jeu des 5 secondes</title>
-  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <h1>🎯 Jeu des 5 secondes</h1>
@@ -18,11 +17,13 @@
   <div class="question">Clique sur le bouton pour commencer !</div>
   <div class="timer">⏱️</div>
   <div class="scores"></div>
+  <div id="podium" style="margin-top: 1em; font-weight: bold;"></div>
 
   <button id="btn-question" onclick="nouvelleQuestion()">Nouvelle question</button>
   <button id="btn-score" style="display: none;" onclick="validerBonneReponse()" disabled>✅ Bonne réponse</button>
   <button id="btn-mauvaise-reponse" style="display: none;" onclick="validerMauvaiseReponse()" disabled>❌ Mauvaise réponse</button>
-  <button onclick="resetJeu()">🔄 Réinitialiser</button>
+  <button id="btn-reset" onclick="resetJeu()">🔄 Réinitialiser</button>
+  <button id="btn-rejouer" onclick="resetJeu()" style="display: none;">🔁 Rejouer la compétition</button>
 
   <audio id="gong" src="https://www.soundjay.com/button/sounds/beep-07.mp3" preload="auto"></audio>
 
@@ -40,12 +41,20 @@
 
     const joueurs = ["Seb", "Louise", "Aurélie"];
     let indexJoueur = 0;
-    let scores = joueurs.reduce((acc, joueur, i) => {
-      document.getElementById(`joueur-${i}`).classList.remove('joueur-actif');
-      return { ...acc, [joueur]: 0 };
-    }, {});
+    const maxQuestionsParJoueur = 5;
+    let totalTours = joueurs.length * maxQuestionsParJoueur;
+    let tourActuel = 0;
+
+    let scores = {};
     let derniereQuestion = '';
     let timerInterval;
+
+    function initialiserScores() {
+      scores = joueurs.reduce((acc, joueur, i) => {
+        document.getElementById(`joueur-${i}`).classList.remove('joueur-actif');
+        return { ...acc, [joueur]: 0 };
+      }, {});
+    }
 
     function afficherJoueur() {
       joueurs.forEach((joueur, i) => {
@@ -64,11 +73,13 @@
       scoresDiv.innerHTML = joueurs.map(j => `${j} : ${scores[j]} pt${scores[j] !== 1 ? 's' : ''}`).join(' | ');
     }
 
+    initialiserScores();
     afficherJoueur();
 
     function nouvelleQuestion() {
-      clearInterval(timerInterval);
+      if (tourActuel >= totalTours) return;
 
+      clearInterval(timerInterval);
       const bouton = document.getElementById('btn-question');
       const boutonScore = document.getElementById('btn-score');
       const boutonMauvaiseReponse = document.getElementById('btn-mauvaise-reponse');
@@ -90,18 +101,11 @@
 
     function lireQuestion(texte, callback) {
       const synth = window.speechSynthesis;
-
-      if (synth.speaking) {
-        synth.cancel();
-      }
+      if (synth.speaking) synth.cancel();
 
       const utterance = new SpeechSynthesisUtterance(texte);
       utterance.lang = 'fr-FR';
-
-      utterance.onend = () => {
-        callback();
-      };
-
+      utterance.onend = callback;
       synth.speak(utterance);
     }
 
@@ -119,10 +123,9 @@
           timerDiv.textContent = `⏱️ ${temps}s`;
           if (temps === 1) timerDiv.style.color = 'red';
         } else {
-          timerDiv.textContent = "⏳ Temps écoulé !";
           clearInterval(timerInterval);
+          timerDiv.textContent = "⏳ Temps écoulé !";
           jouerGong();
-
           boutonScore.style.display = 'inline-block';
           boutonMauvaiseReponse.style.display = 'inline-block';
           boutonScore.disabled = false;
@@ -137,8 +140,7 @@
     }
 
     function validerBonneReponse() {
-      const joueur = joueurs[indexJoueur];
-      scores[joueur]++;
+      scores[joueurs[indexJoueur]]++;
       afficherScores();
       passerAuJoueurSuivant();
     }
@@ -148,26 +150,53 @@
     }
 
     function passerAuJoueurSuivant() {
+      tourActuel++;
       const bouton = document.getElementById('btn-question');
       const boutonScore = document.getElementById('btn-score');
       const boutonMauvaiseReponse = document.getElementById('btn-mauvaise-reponse');
+      const podium = document.getElementById('podium');
 
       boutonScore.disabled = true;
       boutonMauvaiseReponse.disabled = true;
       boutonScore.style.display = 'none';
       boutonMauvaiseReponse.style.display = 'none';
 
+      if (tourActuel >= totalTours) {
+        document.querySelector('.question').textContent = "🎉 Fin de la partie !";
+        document.querySelector('.timer').textContent = "";
+        bouton.disabled = true;
+        afficherPodium();
+        document.getElementById('btn-rejouer').style.display = 'inline-block';
+        return;
+      }
+
       bouton.disabled = false;
       indexJoueur = (indexJoueur + 1) % joueurs.length;
       afficherJoueur();
     }
 
+    function afficherPodium() {
+      const podiumDiv = document.getElementById('podium');
+      const classement = [...joueurs].sort((a, b) => scores[b] - scores[a]);
+      const podiumText = classement.map((j, i) => {
+        const place = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}ᵉ`;
+        return `${place} ${j} (${scores[j]} pts)`;
+      }).join('<br>');
+      podiumDiv.innerHTML = `<hr><div>🏆 Classement final :</div>${podiumText}`;
+    }
+
     function resetJeu() {
       indexJoueur = 0;
-      scores = joueurs.reduce((acc, joueur) => ({ ...acc, [joueur]: 0 }), {});
+      tourActuel = 0;
+      initialiserScores();
       afficherJoueur();
       document.querySelector('.question').textContent = "Clique sur le bouton pour commencer !";
       document.querySelector('.timer').textContent = "";
+      document.getElementById('btn-question').disabled = false;
+      document.getElementById('btn-score').style.display = 'none';
+      document.getElementById('btn-mauvaise-reponse').style.display = 'none';
+      document.getElementById('btn-rejouer').style.display = 'none';
+      document.getElementById('podium').innerHTML = "";
     }
   </script>
 </body>

@@ -8,25 +8,53 @@ const board = Chessboard('board', {
 });
 
 function onDrop(source, target) {
+  if (game.game_over()) return;
+
   const move = game.move({
     from: source,
     to: target,
-    promotion: 'q'
+    promotion: 'q' // promotion automatique en reine
   });
 
-  // Coup invalide => annuler
   if (move === null) return 'snapback';
 
-  // Coup valide => attendre un peu et jouer les noirs
-  window.setTimeout(makeRandomMove, 250);
+  board.position(game.fen());
+
+  // Vérifie si le jeu est terminé après le coup du joueur
+  if (game.game_over()) {
+    showGameOverMessage();
+    return;
+  }
+
+  // Laisser un petit délai avant que l'IA ne joue
+  window.setTimeout(() => {
+    makeRandomMove();
+
+    if (game.game_over()) {
+      showGameOverMessage();
+    }
+  }, 250);
 }
 
 function makeRandomMove() {
-  if (game.game_over()) return;
-
   const moves = game.moves();
-  const move = moves[Math.floor(Math.random() * moves.length)];
+  if (moves.length === 0) return;
 
+  const move = moves[Math.floor(Math.random() * moves.length)];
   game.move(move);
   board.position(game.fen());
+}
+
+function showGameOverMessage() {
+  if (game.in_checkmate()) {
+    alert('Échec et mat !');
+  } else if (game.in_stalemate()) {
+    alert('Pat !');
+  } else if (game.insufficient_material()) {
+    alert('Matériel insuffisant pour mater !');
+  } else if (game.in_draw()) {
+    alert('Match nul !');
+  } else {
+    alert('Partie terminée !');
+  }
 }

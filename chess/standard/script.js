@@ -18,15 +18,14 @@ function onDrop(source, target) {
 
   if (move === null) return 'snapback';
 
-  board.position(game.fen());
+  // Animation du coup joué par le joueur
+  board.move({ from: source, to: target });
 
-  // Vérifie si le jeu est terminé après le coup du joueur
   if (game.game_over()) {
     showGameOverMessage();
     return;
   }
 
-  // Laisser un petit délai avant que l'IA ne joue
   window.setTimeout(() => {
     makeRandomMove();
 
@@ -42,7 +41,13 @@ function makeRandomMove() {
 
   const move = moves[Math.floor(Math.random() * moves.length)];
   game.move(move);
-  board.position(game.fen());
+
+  // Extraire les cases from/to du coup (ex: 'e2e4')
+  const from = move.substring(0, 2);
+  const to = move.substring(2, 4);
+
+  // Animation du coup IA
+  board.move({ from, to });
 }
 
 function showGameOverMessage() {

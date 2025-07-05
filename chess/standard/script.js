@@ -22,7 +22,9 @@ function onDrop(source, target) {
   console.log(" board.position");
 
   //avec animation
-  board.position(game.fen(), true);
+  //board.position(game.fen(), true);
+  // Anime seulement la pièce déplacée (évite le clignotement)
+  board.move(`${move.from}-${move.to}`);
 
   if (game.game_over()) {
     showGameOverMessage();

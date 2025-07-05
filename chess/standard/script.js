@@ -40,14 +40,12 @@ function makeRandomMove() {
   if (moves.length === 0) return;
 
   const move = moves[Math.floor(Math.random() * moves.length)];
-  game.move(move);
 
-  // Extraire les cases from/to du coup (ex: 'e2e4')
-  const from = move.substring(0, 2);
-  const to = move.substring(2, 4);
+  // Avec verbose: true, on récupère from et to pour animer
+  const moveObj = game.move({ move, verbose: true });
+  if (!moveObj) return;
 
-  // Animation du coup IA
-  board.move({ from, to });
+  board.move({ from: moveObj.from, to: moveObj.to });
 }
 
 function showGameOverMessage() {

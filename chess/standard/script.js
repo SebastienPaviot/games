@@ -36,6 +36,7 @@ function onDrop(source, target) {
 }
 
 function makeRandomMove() {
+  console.log("makeRandomMove");
   const moves = game.moves();
   if (moves.length === 0) return;
 

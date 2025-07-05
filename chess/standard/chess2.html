@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chessground Game 0.113</title>
+
+  <!-- ✅ Chessground CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/chessground@8.1.1/chessground.min.css" />
+
+  <style>
+    #board {
+      width: 400px;
+      height: 400px;
+      margin: 20px auto;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <div id="board"></div>
+
+  <!-- ✅ chess.js pour la logique -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.12.0/chess.min.js"></script>
+
+  <!-- ✅ chessground -->
+  <script src="https://unpkg.com/chessground@8.1.1/chessground.min.js"></script>
+
+  <script>
+    const game = new Chess();
+    const boardEl = document.getElementById('board');
+
+    const ground = Chessground(boardEl, {
+      draggable: {
+        enabled: true,
+        showGhost: true
+      },
+      highlight: {
+        lastMove: true,
+        check: true
+      },
+      animation: {
+        enabled: true,
+        duration: 300
+      },
+      movable: {
+        free: false,
+        color: 'white',
+        dests: computeDests(),
+        events: {
+          after: onDrop
+        }
+      },
+      fen: game.fen()
+    });
+
+    function computeDests() {
+      const dests = new Map();
+      game.SQUARES.forEach(sq => {
+        const moves = game.moves({ square: sq, verbose: true });
+        if (moves.length)
+          dests.set(sq, moves.map(m => m.to));
+      });
+      return dests;
+    }
+
+    function onDrop(orig, dest) {
+      const move = game.move({ from: orig, to: dest, promotion: 'q' });
+      if (!move) return;
+
+      updateBoard();
+
+      if (game.game_over()) {
+        setTimeout(showGameOverMessage, 100);
+      } else {
+        setTimeout(() => {
+          makeRandomMove();
+          if (game.game_over()) {
+            setTimeout(showGameOverMessage, 100);
+          }
+        }, 800);
+      }
+    }
+
+    function updateBoard() {
+      ground.set({
+        fen: game.fen(),
+        movable: {
+          color: game.turn() === 'w' ? 'white' : 'black',
+          dests: computeDests()
+        }
+      });
+    }
+
+    function makeRandomMove() {
+      const moves = game.moves();
+      if (moves.length === 0) return;
+
+      const move = moves[Math.floor(Math.random() * moves.length)];
+      game.move(move);
+      updateBoard();
+    }
+
+    function showGameOverMessage() {
+      if (game.in_checkmate()) {
+        alert('Échec et mat !');
+      } else if (game.in_stalemate()) {
+        alert('Pat !');
+      } else if (game.insufficient_material()) {
+        alert('Matériel insuffisant pour mater !');
+      } else if (game.in_draw()) {
+        alert('Match nul !');
+      } else {
+        alert('Partie terminée !');
+      }
+    }
+  </script>
+</body>
+</html>

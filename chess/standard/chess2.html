@@ -2,34 +2,34 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Chessground Game 0.113</title>
+  <title>Chessground Game 2</title>
 
-  <!-- ✅ Chessground CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/chessground@8.1.1/chessground.min.css" />
+  <!-- ✅ Style Chessground -->
+  <link rel="stylesheet" href="https://unpkg.com/chessground@8.2.2/style.css" />
 
   <style>
     #board {
       width: 400px;
       height: 400px;
       margin: 20px auto;
-      border: 1px solid #333;
     }
   </style>
 </head>
 <body>
   <div id="board"></div>
 
-  <!-- ✅ chess.js pour la logique -->
+  <!-- ✅ chess.js (moteur de règles) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.12.0/chess.min.js"></script>
 
-  <!-- ✅ chessground -->
-  <script src="https://unpkg.com/chessground@8.1.1/chessground.min.js"></script>
+  <!-- ✅ Chessground UMD : version correcte avec variable globale `Chessground` -->
+  <script src="https://unpkg.com/chessground@8.2.2/dist/umd/chessground.min.js"></script>
 
   <script>
     const game = new Chess();
-    const boardEl = document.getElementById('board');
 
-    const ground = Chessground(boardEl, {
+    const boardElement = document.getElementById('board');
+
+    const ground = Chessground(boardElement, {
       draggable: {
         enabled: true,
         showGhost: true
@@ -57,8 +57,9 @@
       const dests = new Map();
       game.SQUARES.forEach(sq => {
         const moves = game.moves({ square: sq, verbose: true });
-        if (moves.length)
+        if (moves.length) {
           dests.set(sq, moves.map(m => m.to));
+        }
       });
       return dests;
     }

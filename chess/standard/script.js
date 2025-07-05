@@ -1,4 +1,5 @@
 const game = new Chess();
+console.log("v0.1");
 
 const board = Chessboard('board', {
   draggable: true,

@@ -8,20 +8,17 @@ const board = Chessboard('board', {
 });
 
 function onDrop(source, target) {
-  console.log("onDrop");
-   console.log(target);
   if (game.game_over()) return;
 
   const move = game.move({
     from: source,
     to: target,
-    promotion: 'q' // promotion automatique en reine
+    promotion: 'q'
   });
 
   if (move === null) return 'snapback';
 
-  // Animation du coup joué par le joueur
-  board.move({ from: source, to: target });
+  board.position(game.fen());
 
   if (game.game_over()) {
     showGameOverMessage();
@@ -30,7 +27,6 @@ function onDrop(source, target) {
 
   window.setTimeout(() => {
     makeRandomMove();
-
     if (game.game_over()) {
       showGameOverMessage();
     }
@@ -38,25 +34,13 @@ function onDrop(source, target) {
 }
 
 function makeRandomMove() {
-  console.log("makeRandomMove");
   const moves = game.moves();
-  console.log("Available moves:", moves);
-
   if (moves.length === 0) return;
 
   const move = moves[Math.floor(Math.random() * moves.length)];
-  console.log("Chosen move:", move);
+  game.move(move);
 
-  const moveObj = game.move(move, { verbose: true });
-  console.log("Result moveObj:", moveObj);
-
-  if (!moveObj) return;
-
-  board.move({ from: moveObj.from, to: moveObj.to });
-
-  window.setTimeout(() => {
-    board.position(game.fen());
-  }, 300);
+  board.position(game.fen());
 }
 
 function showGameOverMessage() {

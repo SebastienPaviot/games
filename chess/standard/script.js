@@ -40,13 +40,17 @@ function onDrop(source, target) {
 function makeRandomMove() {
   console.log("makeRandomMove");
   const moves = game.moves();
+  console.log("Available moves:", moves);
+
   if (moves.length === 0) return;
 
   const move = moves[Math.floor(Math.random() * moves.length)];
+  console.log("Chosen move:", move);
 
-  // Avec verbose: true, on récupère from et to pour animer
-  const moveObj = game.move({ move, verbose: true });
-  console.log(moveObj);
+  // Appel correct avec la chaîne move en premier, options en second
+  const moveObj = game.move(move, { verbose: true });
+  console.log("Result moveObj:", moveObj);
+
   if (!moveObj) return;
 
   board.move({ from: moveObj.from, to: moveObj.to });

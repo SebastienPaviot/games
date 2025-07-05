@@ -13,23 +13,20 @@ function onDrop(source, target) {
   const move = game.move({
     from: source,
     to: target,
-    promotion: 'q' // promotion automatique en reine
+    promotion: 'q'
   });
 
   if (move === null) return 'snapback';
 
-  board.position(game.fen());
+  board.move(`${source}-${target}`);
 
-  // Vérifie si le jeu est terminé après le coup du joueur
   if (game.game_over()) {
     showGameOverMessage();
     return;
   }
 
-  // Laisser un petit délai avant que l'IA ne joue
-  window.setTimeout(() => {
+  setTimeout(() => {
     makeRandomMove();
-
     if (game.game_over()) {
       showGameOverMessage();
     }
@@ -42,7 +39,10 @@ function makeRandomMove() {
 
   const move = moves[Math.floor(Math.random() * moves.length)];
   game.move(move);
-  board.position(game.fen());
+
+  const from = move.slice(0, 2);
+  const to = move.slice(2, 4);
+  board.move(`${from}-${to}`);
 }
 
 function showGameOverMessage() {
@@ -51,7 +51,7 @@ function showGameOverMessage() {
   } else if (game.in_stalemate()) {
     alert('Pat !');
   } else if (game.insufficient_material()) {
-    alert('Matériel insuffisant pour mater !');
+    alert('Matériel insuffisant !');
   } else if (game.in_draw()) {
     alert('Match nul !');
   } else {

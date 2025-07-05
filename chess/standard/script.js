@@ -20,7 +20,9 @@ function onDrop(source, target) {
   if (move === null) return 'snapback';
 
   console.log(" board.position");
-  board.position(game.fen());
+
+  //avec animation
+  board.position(game.fen(), true);
 
   if (game.game_over()) {
     showGameOverMessage();
@@ -32,7 +34,7 @@ function onDrop(source, target) {
     if (game.game_over()) {
       showGameOverMessage();
     }
-  }, 250);
+  }, 1000);
 }
 
 function makeRandomMove() {
@@ -45,7 +47,8 @@ function makeRandomMove() {
   game.move(move);
 
   console.log(" board.position");
-  board.position(game.fen());
+ //avec animation
+  board.position(game.fen(), true);
 }
 
 function showGameOverMessage() {

@@ -10,6 +10,7 @@ const board = Chessboard('board', {
 function onDrop(source, target) {
   if (game.game_over()) return;
 
+  console.log("move");
   const move = game.move({
     from: source,
     to: target,
@@ -18,6 +19,7 @@ function onDrop(source, target) {
 
   if (move === null) return 'snapback';
 
+  console.log(" board.position");
   board.position(game.fen());
 
   if (game.game_over()) {
@@ -34,12 +36,15 @@ function onDrop(source, target) {
 }
 
 function makeRandomMove() {
+  console.log("makeRandomMove");
   const moves = game.moves();
   if (moves.length === 0) return;
 
   const move = moves[Math.floor(Math.random() * moves.length)];
+  console.log("move");
   game.move(move);
 
+  console.log(" board.position");
   board.position(game.fen());
 }
 

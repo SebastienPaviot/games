@@ -47,13 +47,16 @@ function makeRandomMove() {
   const move = moves[Math.floor(Math.random() * moves.length)];
   console.log("Chosen move:", move);
 
-  // Appel correct avec la chaîne move en premier, options en second
   const moveObj = game.move(move, { verbose: true });
   console.log("Result moveObj:", moveObj);
 
   if (!moveObj) return;
 
   board.move({ from: moveObj.from, to: moveObj.to });
+
+  window.setTimeout(() => {
+    board.position(game.fen());
+  }, 300);
 }
 
 function showGameOverMessage() {

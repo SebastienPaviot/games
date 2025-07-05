@@ -8,6 +8,8 @@ const board = Chessboard('board', {
 });
 
 function onDrop(source, target) {
+  console.log("onDrop");
+   console.log(target);
   if (game.game_over()) return;
 
   const move = game.move({

@@ -46,6 +46,7 @@ function makeRandomMove() {
 
   // Avec verbose: true, on récupère from et to pour animer
   const moveObj = game.move({ move, verbose: true });
+  console.log(moveObj);
   if (!moveObj) return;
 
   board.move({ from: moveObj.from, to: moveObj.to });
